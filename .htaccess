@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+
+    RewriteEngine On
+    #RewriteBase /path/to/app
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+SetEnv DB_NAME     dibi_name
+SetEnv DB_USER     muhahahaha
+SetEnv DB_PASSWORD s3cR3t

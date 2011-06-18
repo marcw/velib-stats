@@ -16,3 +16,6 @@
 [submodule "vendor/velib"]
 	path = vendor/velib
 	url = git://github.com/marcw/velib.git
+[submodule "vendor/twig"]
+	path = vendor/twig
+	url = git://github.com/fabpot/Twig.git

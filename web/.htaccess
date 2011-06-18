@@ -7,6 +7,6 @@
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
 
-SetEnv DB_NAME     dibi_name
-SetEnv DB_USER     muhahahaha
-SetEnv DB_PASSWORD s3cR3t
+SetEnv DB_NAME     velib_marcw_net
+SetEnv DB_USER     root
+SetEnv DB_PASSWORD

@@ -1,0 +1,22 @@
+<article class="module width_3_quarter">
+    <header><h3>{{ station.name }}</h3></header>
+        <div class="module_content">
+            <table>
+                <tr>
+                    <td>Adresse :</td>
+                    <td>{{ station.fullAddress }}</td>
+                </tr>
+                <tr>
+                    <td>Status :</td>
+                    <td>{{ station.open ? 'Ouverte' : 'Fermée' }}</td>
+                </tr>
+                <tr>
+                    <td>Velib+ :</td>
+                    <td>{{ station.bonus ? 'Oui' : 'Non' }}</td>
+                </tr>
+            </table>
+            {% set coord= station.lat~','~station.lng %}
+            <img src="http://maps.google.com/maps/api/staticmap?center={{ coord }}&zoom=15&size=610x380&sensor=false&markers={{coord}}" />
+        </div>
+</article>
+

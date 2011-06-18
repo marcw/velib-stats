@@ -1,0 +1,11 @@
+<article class="stats_overview">
+    <div class="overview_today">
+        <p class="overview_count">{{ now.available }}</p>
+        <p class="overview_day">Disponibles</p>
+    </div>
+    <div class="overview_previous">
+        <p class="overview_count">{{ now.free }}</p>
+        <p class="overview_day">Emplacements</p>
+    </div>
+    <p class="overview_type">maj: {{ now.created_at|date('H:i:s') }}</p>
+</article>

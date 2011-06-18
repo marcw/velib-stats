@@ -1,0 +1,3 @@
+{% for station in stations %}
+    <li class="icn_tags"><a href="{{ app.url_generator.generate('station_show', { 'id': station.id }) }}">{{ station.name }}</a></li>
+{% endfor %}

@@ -1,0 +1,24 @@
+<script type="text/javascript">
+    function draw24hChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', 'Vélos');
+        data.addColumn('number', 'Emplacements');
+        data.addRows({{ data|length }});
+        {% for key, values in data %}
+            data.setValue({{ key }}, 0, '{{ values.created_at|date("H:i:s") }}');
+            data.setValue({{ key }}, 1, {{ values.available }});
+            data.setValue({{ key }}, 2, {{ values.free }});
+        {% endfor %}
+
+        var chart = new google.visualization.LineChart(document.getElementById('24h_chart'));
+        chart.draw(data, {width: 600, height: 240, title: 'Evolution dernières 24h'});
+      }
+
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(draw24hChart);
+</script>
+
+<article class="stats_graph">
+      <div id="24h_chart"></div>
+</article>

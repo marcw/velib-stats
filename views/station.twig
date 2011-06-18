@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <article class="module width_full">
+        <header><h3>Stats</h3></header>
+            <div class="module_content">
+                <esi:include src="{{ app.url_generator.generate('station_data_24h', { 'id' : id }) }}" />
+                <esi:include src="{{ app.url_generator.generate('station_data_now', { 'id' : id }) }}" />
+                <div class="clear"></div>
+            </div>
+    </article>
+
+    <esi:include src="{{ app.url_generator.generate('station_info', { 'id': id }) }}" />
+{% endblock %}

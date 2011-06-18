@@ -99,7 +99,7 @@ $app->get('/station/{id}/now', function ($id) use ($app) {
     return new Response($body, 200, array('Cache-Control' => 's-maxage=600'));
 })->bind('station_data_now');
 
-// What do we know about this station NOW
+// What do we know about this station from last 24h
 $app->get('/station/{id}/24h', function ($id) use ($app) {
     $stmt = $app['db']->executeQuery('SELECT * FROM velib_station_data WHERE station_id = ? AND TO_DAYS(NOW()) - TO_DAYS(created_at) < 1 ORDER BY created_at ASC', array((int) $id));
     $data = $stmt->fetchAll();

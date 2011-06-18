@@ -1,5 +1,8 @@
 # Velib Stats
 
+This application allows to display some statitics about velib bike rental
+system stations.
+
 ## Install:
 
 1. Play with your command line:

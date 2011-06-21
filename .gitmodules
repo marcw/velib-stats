@@ -19,3 +19,9 @@
 [submodule "vendor/twig"]
 	path = vendor/twig
 	url = git://github.com/fabpot/Twig.git
+[submodule "vendor/pomm"]
+	path = vendor/pomm
+	url = git://github.com/chanmix51/Pomm.git
+[submodule "vendor/GHub/pommExtension"]
+	path = vendor/GHub/pommExtension
+	url = git://github.com/chanmix51/PommExtension.git

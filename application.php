@@ -1,46 +1,18 @@
 <?php
 
-require_once __DIR__.'/vendor/silex.phar';
+require "bootstrap.php";
 
 use Symfony\Component\HttpFoundation\Response;
 
-$app = new Silex\Application();
-$app['autoloader']->registerNamespace('MarcW', array(__DIR__.'/vendor/marcw-buzz/lib', __DIR__.'/vendor/marcw-velib/lib'));
-
-// Registering extensions
-$app->register(new MarcW\BuzzExtension(), array('buzz.class_path' => __DIR__.'/vendor/buzz/lib'));
-$app->register(new MarcW\VelibExtension(), array('velib.class_path' => __DIR__.'/vendor/velib/lib'));
-$app->register(new Silex\Extension\HttpCacheExtension(), array('http_cache.cache_dir' => __DIR__.'/cache'));
-$app->register(new Silex\Extension\TwigExtension(), array('twig.path' => __DIR__.'/views', 'twig.class_path' => __DIR__.'/vendor/twig/lib'));
-$app->register(new Silex\Extension\UrlGeneratorExtension());
-$app->register(new Silex\Extension\DoctrineExtension(), array(
-    'db.options' => array(
-        'driver'   => 'pdo_mysql',
-        'dbname'   => $_SERVER['DB_NAME'],
-        'host'     => 'localhost',
-        'user'     => $_SERVER['DB_USER'],
-        'password' => $_SERVER['DB_PASSWORD'],
-    ),
-    'db.dbal.class_path'    => __DIR__.'/vendor/doctrine-dbal/lib',
-    'db.common.class_path'  => __DIR__.'/vendor/doctrine-common/lib',
-    )
-);
+$app['db'] = $app['pomm']
+    ->getDatabase()
+    ->createConnection();
 
 // Updating database with list of stations
 $app->get('/update/list', function() use ($app) {
     $stations = $app['velib']->stationList();
-    foreach ($stations as $k => $station) {
-        $result = $app['db']->fetchColumn('SELECT id FROM velib_station WHERE id = ?', array($k));
-        if ($result) {
-            $station['updated_at'] = date('Y-m-d H:i:s');
-            $app['db']->update('velib_station', $station, array('id' => $k));
-        } else {
-            $station['created_at'] = date('Y-m-d H:i:s');
-            $station['updated_at'] = date('Y-m-d H:i:s');
-            $station['id'] = $k;
-            $app['db']->insert('velib_station', $station);
-        }
-    }
+    $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation')
+        ->updateStations($stations);
 
     // Stores the response in cache for 1 day.
     return new Response('', 200, array('Cache-Control' => 's-maxage=86400'));
@@ -54,22 +26,20 @@ $app->get('/update/{id}', function ($id) use ($app) {
     }
 
     // Update database
-    $app['db']->insert('velib_station_data', array(
-        'station_id'   => (int) $id,
-        'created_at'      => date('Y-m-d H:i:s'),
-        'available' => $values['available'],
-        'free'      => $values['free'],
-        'total'     => $values['total'],
-        'ticket'    => $values['ticket'],
-    ));
+    $map = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData');
+
+    $velib_station_data = $map->createObject();
+    $values['station_id'] = $id;
+    $velib_station_data->hydrate($values);
+    $map->saveOne($velib_station_data);
 
     return new Response('', 200, array('Cache-Control' => 's-maxage=600'));
 });
 
 // Station list
 $app->get('/station/list', function() use ($app) {
-    $stmt = $app['db']->executeQuery("SELECT v.* FROM `velib_station` AS v RIGHT JOIN velib_station_data AS d ON v.id=d.station_id GROUP BY v.id");
-    $stations = $stmt->fetchAll();
+    $stations = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation')
+        ->findAllWithData();
 
     $body = $app['twig']->render('station_list.twig', array('stations' => $stations));
 
@@ -85,7 +55,8 @@ $app->get('/station/{id}', function($id) use ($app) {
 
 // Textual information about station
 $app->get('/station/{id}/info', function ($id) use ($app) {
-    $info = $app['db']->fetchAssoc('SELECT * FROM velib_station WHERE id= ?', array((int) $id));
+    $info = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation')
+        ->findByPk(array('id' => $id));
     $body = $app['twig']->render('station_info.twig', array('station' => $info));
 
     return new Response($body, 200, array('Cache-Control' => 's-maxage=86400'));
@@ -93,7 +64,8 @@ $app->get('/station/{id}/info', function ($id) use ($app) {
 
 // What do we know about this station NOW
 $app->get('/station/{id}/now', function ($id) use ($app) {
-    $now = $app['db']->fetchAssoc('SELECT * FROM velib_station_data WHERE station_id = ? ORDER BY created_at DESC LIMIT 1', array((int) $id));
+    $now = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData')
+        ->findWhere('station_id = ?', array($id), 'ORDER BY created_at DESC LIMIT 1');
     $body = $app['twig']->render('station_data_now.twig', array('now' => $now));
 
     return new Response($body, 200, array('Cache-Control' => 's-maxage=600'));
@@ -101,8 +73,8 @@ $app->get('/station/{id}/now', function ($id) use ($app) {
 
 // What do we know about this station from last 24h
 $app->get('/station/{id}/24h', function ($id) use ($app) {
-    $stmt = $app['db']->executeQuery('SELECT * FROM velib_station_data WHERE station_id = ? AND TO_DAYS(NOW()) - TO_DAYS(created_at) < 1 ORDER BY created_at ASC', array((int) $id));
-    $data = $stmt->fetchAll();
+    $data = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData')
+        ->findWhere("station_id = ? AND (now()::timestamp - created_at) < '1d'", array($id), 'ORDER BY created_at ASC');
 
     $body = $app['twig']->render('station_data_24h.twig', array('data' => $data));
 

@@ -4,7 +4,7 @@
             <table>
                 <tr>
                     <td>Adresse :</td>
-                    <td>{{ station.fullAddress }}</td>
+                    <td>{{ station.fulladdress }}</td>
                 </tr>
                 <tr>
                     <td>Status :</td>
@@ -15,7 +15,7 @@
                     <td>{{ station.bonus ? 'Oui' : 'Non' }}</td>
                 </tr>
             </table>
-            {% set coord= station.lat~','~station.lng %}
+            {% set coord= station.coord.x~','~station.coord.y %}
             <img src="http://maps.google.com/maps/api/staticmap?center={{ coord }}&zoom=15&size=610x380&sensor=false&markers={{coord}}" />
         </div>
 </article>

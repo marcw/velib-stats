@@ -16,6 +16,6 @@
 [submodule "vendor/pomm"]
 	path = vendor/pomm
 	url = git://github.com/chanmix51/Pomm.git
-[submodule "vendor/GHub/pommExtension"]
-	path = vendor/GHub/pommExtension
+[submodule "vendor/GHub/PommExtension"]
+	path = vendor/GHub/PommExtension
 	url = git://github.com/chanmix51/PommExtension.git

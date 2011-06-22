@@ -38,8 +38,15 @@ class VelibStationMap extends BaseVelibStationMap
 
     public function findAllWithData()
     {
-        $sql = sprintf("SELECT %s FROM vlib.velib_station s RIGHT JOIN vlib.velib_station_data d ON s.id = d.station_id ORDER BY id ASC", join(', ', $this->getSelectFields('s')));
+        $sql = sprintf("SELECT %s FROM vlib.velib_station s WHERE s.id IN (SELECT a.id FROM vlib.velib_station a JOIN vlib.velib_station_data d ON a.id = d.station_id) ORDER BY id ASC", join(', ', $this->getSelectFields('s')));
 
         return $this->query($sql);
+    }
+
+    public function findNearest($id, $limit = 5)
+    {
+        $sql = sprintf("SELECT %s, (coord(a) <-> coord(b)) AS distance FROM vlib.velib_station a, vlib.velib_station b WHERE a.id = ? AND a.id != b.id ORDER BY distance ASC LIMIT %d", join(', ', $this->getSelectFields('b')), $limit);
+
+        return $this->query($sql, array($id));
     }
 }

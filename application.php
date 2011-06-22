@@ -55,9 +55,13 @@ $app->get('/station/{id}', function($id) use ($app) {
 
 // Textual information about station
 $app->get('/station/{id}/info', function ($id) use ($app) {
-    $info = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation')
+    $map = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation');
+    $info = $map
         ->findByPk(array('id' => $id));
-    $body = $app['twig']->render('station_info.twig', array('station' => $info));
+    $nearest = $map
+        ->findNearest($id);
+
+    $body = $app['twig']->render('station_info.twig', array('station' => $info, 'nearest' => $nearest));
 
     return new Response($body, 200, array('Cache-Control' => 's-maxage=86400'));
 })->bind('station_info');

@@ -69,7 +69,7 @@ $app->get('/station/{id}/info', function ($id) use ($app) {
 // What do we know about this station NOW
 $app->get('/station/{id}/now', function ($id) use ($app) {
     $now = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData')
-        ->findWhere('station_id = ?', array($id), 'ORDER BY created_at DESC LIMIT 1');
+        ->getLast($id);
     $body = $app['twig']->render('station_data_now.twig', array('now' => $now));
 
     return new Response($body, 200, array('Cache-Control' => 's-maxage=600'));
@@ -78,7 +78,7 @@ $app->get('/station/{id}/now', function ($id) use ($app) {
 // What do we know about this station from last 24h
 $app->get('/station/{id}/24h', function ($id) use ($app) {
     $data = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData')
-        ->findWhere("station_id = ? AND (now()::timestamp - created_at) < '1d'", array($id), 'ORDER BY created_at ASC');
+        ->getOlderUntil($id, 1);
 
     $body = $app['twig']->render('station_data_24h.twig', array('data' => $data));
 

@@ -17,8 +17,8 @@ ALTER TABLE ONLY vlib.velib_station_data DROP CONSTRAINT velib_station_data_stat
 DROP TRIGGER updated_at_velib_station ON vlib.velib_station;
 ALTER TABLE ONLY vlib.velib_station DROP CONSTRAINT velib_station_pkey;
 ALTER TABLE ONLY vlib.velib_station_data DROP CONSTRAINT velib_station_data_pkey;
-DROP TABLE vlib.velib_station_data;
 DROP TABLE vlib.velib_station;
+DROP TABLE vlib.velib_station_data;
 DROP FUNCTION vlib.update_updated_at();
 DROP SCHEMA vlib;
 --
@@ -50,23 +50,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: velib_station; Type: TABLE; Schema: vlib; Owner: -; Tablespace: 
---
-
-CREATE TABLE velib_station (
-    id integer NOT NULL,
-    bonus boolean NOT NULL,
-    fulladdress text NOT NULL,
-    address character varying(255) NOT NULL,
-    coord point NOT NULL,
-    name character varying(255) NOT NULL,
-    open boolean NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: velib_station_data; Type: TABLE; Schema: vlib; Owner: -; Tablespace: 
 --
 
@@ -80,6 +63,24 @@ CREATE TABLE velib_station_data (
     CONSTRAINT velib_station_data_available_check CHECK ((available >= 0)),
     CONSTRAINT velib_station_data_free_check CHECK ((free >= 0)),
     CONSTRAINT velib_station_data_total_check CHECK ((total > 0))
+);
+
+
+--
+-- Name: velib_station; Type: TABLE; Schema: vlib; Owner: -; Tablespace: 
+--
+
+CREATE TABLE velib_station (
+    id integer NOT NULL,
+    bonus boolean NOT NULL,
+    fulladdress text NOT NULL,
+    address character varying(255) NOT NULL,
+    coord point NOT NULL,
+    name character varying(255) NOT NULL,
+    open boolean NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    data velib_station_data
 );
 
 

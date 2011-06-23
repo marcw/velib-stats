@@ -15,9 +15,15 @@
                     <td>{{ station.bonus ? 'Oui' : 'Non' }}</td>
                 </tr>
             </table>
-            {% set markers = 'markers=color:red%7Clabel:1%7C'~station.coord.x~','~station.coord.y %}
+            {% set markers = 'markers=color:green%7Clabel:*%7C'~station.coord.x~','~station.coord.y %}
             {% for near in nearest %}
-              {% set markers = markers ~ '&markers=color:yellow%7Clabel:-%7C'~near.coord.x~','~near.coord.y %}
+            {% if near.data.available == 0 %}
+              {% set markers = markers ~ '&markers=color:red%7Clabel:X%7C'~near.coord.x~','~near.coord.y %}
+            {% elseif near.data.available <= 5 %}
+              {% set markers = markers ~ '&markers=color:orange%7Clabel:o%7C'~near.coord.x~','~near.coord.y %}
+            {% else %}
+              {% set markers = markers ~ '&markers=color:yellow%7Clabel:*%7C'~near.coord.x~','~near.coord.y %}
+            {% endif %}
             {% endfor %}
             <img src="http://maps.google.com/maps/api/staticmap?center={{ coord }}&zoom=15&size=610x380&sensor=false&{{markers}}" />
         </div>

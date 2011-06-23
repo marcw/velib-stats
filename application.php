@@ -26,12 +26,27 @@ $app->get('/update/{id}', function ($id) use ($app) {
     }
 
     // Update database
-    $map = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData');
+    $data_map = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData');
+    $station_map = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStation');
 
-    $velib_station_data = $map->createObject();
-    $values['station_id'] = $id;
-    $velib_station_data->hydrate($values);
-    $map->saveOne($velib_station_data);
+    try
+    {
+        $app['db']->begin();
+        $velib_station_data = $data_map->createObject();
+        $values['station_id'] = $id;
+        $velib_station_data->hydrate($values);
+        $data_map->saveOne($velib_station_data);
+        $velib_station = $station_map->findByPk(array('id' => $id));
+        $velib_station->setData($velib_station_data);
+        $station_map->saveOne($velib_station);
+        $app['db']->commit();
+    }
+    catch (Exception $e)
+    {
+        $app['db']->rollback();
+
+        throw $e;
+    }
 
     return new Response('', 200, array('Cache-Control' => 's-maxage=600'));
 });

@@ -20,5 +20,5 @@ $app->register(
     array(
         'pomm.class_path' => __DIR__.'/vendor/pomm',
         'pomm.connections' => array(
-            'default' => array('dsn' => 'pgsql://greg/greg')))
+            'default' => array('dsn' => 'pgsql://greg/greg', 'class' => 'Model\Pomm\Database\VlibDb')))
         );

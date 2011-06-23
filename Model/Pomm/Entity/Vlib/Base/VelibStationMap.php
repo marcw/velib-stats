@@ -21,6 +21,7 @@ abstract class VelibStationMap extends BaseObjectMap
         $this->addField('open', 'Boolean');
         $this->addField('created_at', 'Timestamp');
         $this->addField('updated_at', 'Timestamp');
+        $this->addField('data', 'VelibStationData');
 
         $this->pk_fields = array('id');
     }

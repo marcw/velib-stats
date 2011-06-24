@@ -6,7 +6,3 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
-
-SetEnv DB_NAME     velib_marcw_net
-SetEnv DB_USER     root
-SetEnv DB_PASSWORD

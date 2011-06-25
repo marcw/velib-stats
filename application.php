@@ -38,7 +38,7 @@ $app->get('/update/{id}', function ($id) use ($app) {
         $data_map->saveOne($velib_station_data);
         $velib_station = $station_map->findByPk(array('id' => $id));
         $velib_station->setData($velib_station_data);
-        $station_map->saveOne($velib_station);
+        $station_map->updateOne($velib_station, array('data'));
         $app['db']->commit();
     }
     catch (Exception $e)
@@ -85,7 +85,7 @@ $app->get('/station/{id}/info', function ($id) use ($app) {
 $app->get('/station/{id}/now', function ($id) use ($app) {
     $now = $app['db']->getMapFor('Model\Pomm\Entity\Vlib\VelibStationData')
         ->getLast($id);
-    $body = $app['twig']->render('station_data_now.twig', array('now' => $now));
+    $body = $app['twig']->render('station_data_now.twig', array('now' => $now[0]));
 
     return new Response($body, 200, array('Cache-Control' => 's-maxage=600'));
 })->bind('station_data_now');
